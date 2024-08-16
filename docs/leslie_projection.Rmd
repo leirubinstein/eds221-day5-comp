@@ -43,16 +43,20 @@ Add line-by-line comments wheres prompted in the code below, explaining what eac
 # ------ WHAT HAPPENS HERE? ------ #
 # ------ comment line-by-line ---- #
 
-# The line below...
+# The line below creates a time vector from year 0 to year 8, in increments of one year
 time_yr <- seq(from = 0, to = 8, by = 1)
 
-# The line below...
+# The line below creates an empty matrix with 4 columns and the same number of rows equal to the length of the time vector
 proj_year <- matrix(ncol = length(fish_year0), nrow = length(time_yr))
 
-# The line below...
+# The line below projects the population for the first year
 proj_year[1, ] <- fish_year0
 
-# The for loop below...
+# this projects the population for the second year; it follows that the projection for future years is `%*% projected year minus one`
+# starts at 2 and not 1 because row 1 is the starting population size
+proj_year[2,] <- fish_leslie %*% proj_year[1,]
+
+# The for loop below projects the population from the first year onwards after the initial population, filling it in the matrix
 for (i in 2:length(time_yr)) {
   proj_year[i,] <- fish_leslie %*% proj_year[i-1,]
 }
@@ -61,6 +65,7 @@ for (i in 2:length(time_yr)) {
 # The rest is wrangling & visualization (run to check it out):
 colnames(proj_year) <- c("eggs", "fry", "juvenile", "adult")
 
+# adding time vector onto our matrix, making the datafram long
 proj_df <- data.frame(time_yr, proj_year) %>% 
   pivot_longer(cols = -time_yr, names_to = "lifestage", values_to = "stage_population")
 
